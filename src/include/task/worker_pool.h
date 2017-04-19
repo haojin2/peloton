@@ -45,6 +45,8 @@ private:
 class WorkerThread{
 public:
 
+  ~WorkerThread();
+
   void StartThread(WorkerPool* worker_pool);
 
   // poll work queue, until exiting

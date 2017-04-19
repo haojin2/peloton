@@ -12,9 +12,18 @@
 
 #include "include/task/worker_pool.h"
 #include <unistd.h>
+#include <iostream>
 
 namespace peloton{
 namespace task{
+
+WorkerThread::~WorkerThread() {
+  shutdown_thread_ = true;
+  if (worker_thread_.joinable()) {
+    worker_thread_.join();
+  }
+  // return;
+}
 
 void WorkerThread::StartThread(WorkerPool* current_pool){
   shutdown_thread_ = false;
@@ -42,7 +51,9 @@ void WorkerThread::PollForWork(WorkerThread* current_thread, WorkerPool* current
 
 void WorkerThread::Shutdown() {
   shutdown_thread_ = true;
-  worker_thread_.join();
+  if (worker_thread_.joinable()) {
+    worker_thread_.join();
+  }
 }
 
 WorkerPool::WorkerPool(size_t num_threads, size_t task_queue_size) :

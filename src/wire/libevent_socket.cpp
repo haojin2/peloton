@@ -388,7 +388,7 @@ void LibeventSocket::PrintWriteBuffer() {
 // Return false when the socket is not ready for write
 WriteState LibeventSocket::BufferWriteBytesHeader(OutputPacket *pkt) {
   // If we should not write
-  if (pkt->skip_header_write) {
+  if (!pkt || pkt->skip_header_write) {
     return WRITE_COMPLETE;
   }
 
@@ -432,6 +432,7 @@ WriteState LibeventSocket::BufferWriteBytesHeader(OutputPacket *pkt) {
 // Writes a packet's content into the write buffer
 // Return false when the socket is not ready for write
 WriteState LibeventSocket::BufferWriteBytesContent(OutputPacket *pkt) {
+  if (!pkt) {return WRITE_COMPLETE;}
   // the packet content to write
   ByteBuf &pkt_buf = pkt->buf;
   // the length of remaining content to write
