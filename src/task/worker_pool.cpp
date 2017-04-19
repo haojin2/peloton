@@ -44,6 +44,7 @@ void WorkerThread::PollForWork(WorkerThread* current_thread, WorkerPool* current
       continue;
     }
     // call the task
+    LOG_INFO("Dequeued task from queue...\n");
     t.func_ptr_(t.func_args_);
     empty_count = 0;
   }
@@ -72,6 +73,7 @@ WorkerPool& WorkerPool::GetInstance() {
 }
 
 void WorkerPool::SubmitTask(void(*func_ptr)(void *), void *func_args) {
+  LOG_INFO("Enqueued task to queue...\n");
   task_queue_.Enqueue(Task(func_ptr, func_args));
 }
 

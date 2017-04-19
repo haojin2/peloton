@@ -16,6 +16,7 @@
 #include <thread>
 #include <memory>
 #include "container/lock_free_queue.h"
+#include "common/logger.h"
 
 //TODO: should be configurable
 #define DEFAULT_NUM_WORKER_THREADS (std::thread::hardware_concurrency())
