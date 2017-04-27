@@ -383,7 +383,7 @@ void PacketManager::ExecParseMessage(InputPacket *pkt) {
   GetStringToken(pkt, query_string);
   skipped_stmt_ = false;
   Statement::ParseQueryType(query_string, query_type);
-
+  LOG_INFO("Parse query is: %s", query_string.c_str());
   // For an empty query or a query to be filtered, just send parse complete
   // response and don't execute
   if (query_string == "" || HardcodedExecuteFilter(query_type) == false) {
@@ -462,7 +462,8 @@ void PacketManager::ExecBindMessage(InputPacket *pkt) {
   // BIND message
   GetStringToken(pkt, portal_name);
   GetStringToken(pkt, statement_name);
-
+  LOG_INFO("BIND portal name: %s\n", portal_name.c_str());
+  LOG_INFO("BIND statement name: %s\n", statement_name.c_str());
   if (skipped_stmt_) {
     // send bind complete
     std::unique_ptr<OutputPacket> response(new OutputPacket());
@@ -753,6 +754,7 @@ bool PacketManager::ExecDescribeMessage(InputPacket *pkt) {
   std::string portal_name;
   PacketGetBytes(pkt, 1, mode);
   GetStringToken(pkt, portal_name);
+  LOG_INFO("DESCRIBE portal name: %s\n", portal_name.c_str());
   if (mode[0] == 'P') {
     LOG_TRACE("Describe a portal");
     auto portal_itr = portals_.find(portal_name);
@@ -910,7 +912,8 @@ void PacketManager::ExecCloseMessage(InputPacket *pkt) {
  *  Returns false if the session needs to be closed.
  */
 bool PacketManager::ProcessPacket(LibeventSocket * conn) {
-  LOG_TRACE("Message type: %c", static_cast<unsigned char>(pkt->msg_type));
+  LOG_INFO("Message type: %c\n", static_cast<unsigned char>(conn->rpkt.msg_type));
+
   // get packet and connection thread id
   InputPacket *pkt = &(conn->rpkt);
   // We don't set force_flush to true for `PBDE` messages because they're

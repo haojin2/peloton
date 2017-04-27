@@ -19,8 +19,10 @@
 #include "common/logger.h"
 
 //TODO: should be configurable
-#define DEFAULT_NUM_WORKER_THREADS (std::thread::hardware_concurrency())
+//#define DEFAULT_NUM_WORKER_THREADS (std::thread::hardware_concurrency())
+#define DEFAULT_NUM_WORKER_THREADS 1
 //TODO: make configurable, choose some more reasonable default value
+//#define DEFAULT_TASK_QUEUE_LENGTH (std::thread::hardware_concurrency()*4)
 #define DEFAULT_TASK_QUEUE_LENGTH (std::thread::hardware_concurrency()*4)
 
 namespace peloton{

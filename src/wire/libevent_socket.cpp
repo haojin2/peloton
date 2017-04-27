@@ -12,6 +12,7 @@
 
 #include <unistd.h>
 #include "wire/libevent_server.h"
+#include <assert.h>
 
 namespace peloton {
 namespace wire {
@@ -388,7 +389,8 @@ void LibeventSocket::PrintWriteBuffer() {
 // Return false when the socket is not ready for write
 WriteState LibeventSocket::BufferWriteBytesHeader(OutputPacket *pkt) {
   // If we should not write
-  if (!pkt || pkt->skip_header_write) {
+  assert (pkt!=NULL);
+  if (pkt->skip_header_write) {
     return WRITE_COMPLETE;
   }
 
@@ -432,7 +434,7 @@ WriteState LibeventSocket::BufferWriteBytesHeader(OutputPacket *pkt) {
 // Writes a packet's content into the write buffer
 // Return false when the socket is not ready for write
 WriteState LibeventSocket::BufferWriteBytesContent(OutputPacket *pkt) {
-  if (!pkt) {return WRITE_COMPLETE;}
+  assert (pkt!=NULL);
   // the packet content to write
   ByteBuf &pkt_buf = pkt->buf;
   // the length of remaining content to write
