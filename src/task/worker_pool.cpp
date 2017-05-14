@@ -12,9 +12,17 @@
 
 #include "include/task/worker_pool.h"
 #include <unistd.h>
+#include "common/logger.h"
 
 namespace peloton{
 namespace task{
+
+WorkerThread::~WorkerThread() {
+  LOG_ERROR("Hit destructor");
+  if (worker_thread_.joinable()) {
+    worker_thread_.join();
+  }
+}
 
 void WorkerThread::StartThread(WorkerPool* current_pool){
   shutdown_thread_ = false;

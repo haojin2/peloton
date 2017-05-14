@@ -785,10 +785,10 @@ bool PacketManager::ExecDescribeMessage(InputPacket *pkt) {
   }
   return true;
 }
-s
+
 // Execute the exec message in a worker thread
 void PacketManager::ExecExecuteMessageAsync(void* conn_ptr){
-  LOG_DEBUG("Exec Execute Message Async starting");
+//  LOG_DEBUG("Exec Execute Message Async starting");
   wire::LibeventSocket * conn = (wire::LibeventSocket *)conn_ptr;
   InputPacket *pkt = &conn->rpkt;
   PacketManager *pkt_mgr = &conn->pkt_manager;
@@ -796,7 +796,7 @@ void PacketManager::ExecExecuteMessageAsync(void* conn_ptr){
   conn->worker_executing = false;
   // tell the networking thread it can write
   event_active(conn->event, EV_WRITE, 0);
-  LOG_DEBUG("Exec Execute Message Async done, activating the event");
+//  LOG_DEBUG("Exec Execute Message Async done, activating the event");
 }
 
 void PacketManager::ExecExecuteMessage(InputPacket *pkt,
@@ -830,6 +830,7 @@ void PacketManager::ExecExecuteMessage(InputPacket *pkt,
 
   auto statement = portal->GetStatement();
   const auto &query_type = statement->GetQueryType();
+//  LOG_DEBUG("query string: %s", statement.get()->GetQueryString().c_str());
 
   auto param_stat = portal->GetParamStat();
   if (statement.get() == nullptr) {

@@ -153,8 +153,7 @@ void StateMachine(LibeventSocket *conn) {
           conn->pkt_manager.is_started = true;
         } else {
           // Process all other packets
-          status = conn->pkt_manager.ProcessPacket(&conn->rpkt,
-                                                   (size_t)conn->thread_id);
+          status = conn->pkt_manager.ProcessPacket(conn);
         }
         if (conn->worker_executing){
           // work is executing in the background
