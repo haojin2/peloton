@@ -12,6 +12,9 @@
 
 #include "wire/libevent_server.h"
 
+
+#include "event2/thread.h"
+
 #include <fcntl.h>
 #include <inttypes.h>
 #include <sys/socket.h>
