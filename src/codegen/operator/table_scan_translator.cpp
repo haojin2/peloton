@@ -74,6 +74,8 @@ TableScanTranslator::TableScanTranslator(const planner::SeqScanPlan &scan,
 void TableScanTranslator::TaskProduce(llvm::Value *tile_group_begin,
                                       llvm::Value *tile_group_end) const {
   auto &codegen = GetCodeGen();
+  auto &compilation_context = GetCompilationContext();
+  auto &runtime_state = compilation_context.GetRuntimeState();
   auto &table = GetTable();
 
   LOG_TRACE("TableScan on [%u] starting to produce tuples ...", table.GetOid());
@@ -85,9 +87,44 @@ void TableScanTranslator::TaskProduce(llvm::Value *tile_group_begin,
   llvm::Value* table_ptr = codegen.Call(StorageManagerProxy::GetTableWithOid,
                                         {catalog_ptr, db_oid, table_oid});
 
-  // The selection vector for the scan
-  Vector sel_vec{LoadStateValue(selection_vector_id_),
-                 Vector::kDefaultVectorSize, codegen.Int32Type()};
+  Vector task_info_vec{LoadStateValue(task_info_vector_id_),
+                       Vector::kDefaultVectorSize,
+                       TaskInfoProxy::GetType(codegen)};
+
+  auto task_info_ptr = task_info_vec.GetPtrToValue(codegen, codegen.Const32(0));
+
+  codegen.Call(TaskInfoProxy::Init, {
+      task_info_ptr,
+      /*task_id=*/codegen.Const32(0),
+      /*ntasks=*/codegen.Const32(1)
+  });
+
+  // auto thread_pool = codegen::ExecutorThreadPool::GetInstance();
+  auto thread_pool_ptr = codegen.Call(
+      ExecutorThreadPoolProxy::GetInstance, {}
+  );
+
+  // using task_type = void (*)(char *ptr, TaskInfo *);
+  auto task_info_type = TaskInfoProxy::GetType(codegen);
+  auto task_func_type = llvm::FunctionType::get(
+      codegen.VoidType(), {
+          codegen.CharPtrType(),
+          task_info_type->getPointerTo()
+      },
+      false
+  )->getPointerTo();
+
+  // thread_pool->SubmitTask(
+  //   (char *)runtime_state,
+  //   task_info,
+  //   (task_type)task
+  // );
+  codegen.Call(codegen::ExecutorThreadPoolProxy::SubmitTask, {
+      thread_pool_ptr,
+      codegen->CreatePointerCast(codegen.GetState(), codegen.CharPtrType()),
+      task_info_ptr,
+      codegen->CreatePointerCast(task_func, task_func_type)
+  });
 
   // Generate the scan
   ScanConsumer scan_consumer{*this, sel_vec};
