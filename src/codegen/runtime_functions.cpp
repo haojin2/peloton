@@ -134,6 +134,7 @@ void RuntimeFunctions::ParallelHashJoinDestroy(int32_t ntasks,
     hash_tables[i].Destroy();
   }
   delete[] reinterpret_cast<char *>(hash_tables);
+
 }
 
 }  // namespace codegen

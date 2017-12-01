@@ -221,6 +221,10 @@ llvm::Function *CompilationContext::GeneratePlanFunction(
       codegen_.VoidType(),
       {{"runtimeState", runtime_state.FinalizeType(codegen_)->getPointerTo()}}};
 
+  PushParallelInitCallback([&](llvm::Value *ntasks) {
+    result_consumer_.InitializeParallelState(*this, ntasks);
+  });
+
   // Generate the primary plan logic
   Produce(root);
 

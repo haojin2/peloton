@@ -76,6 +76,7 @@ class RuntimeFunctions {
 
   static void ParallelHashJoinDestroy(int32_t ntasks,
                                       util::OAHashTable *hash_tables);
+
 };
 
 }  // namespace codegen
