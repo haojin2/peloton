@@ -13,13 +13,14 @@
 #include "planner/hash_join_plan.h"
 #include "planner/hash_plan.h"
 #include "codegen/multi_thread/multithread_supported.h"
+#include <iostream>
 
 namespace peloton {
 namespace codegen {
 
 bool MultithreadSupported(const planner::AbstractPlan &plan) {
   switch (plan.GetPlanNodeType()) {
-// Temporarily turned off...
+	// Temporarily turned off...
     case PlanNodeType::SEQSCAN: {
       return true;
     }

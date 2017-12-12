@@ -25,7 +25,7 @@ namespace util {
 // one is first created. We use, by default, 8K elements. This should be
 // extended with result from the query optimizer to approximated number of
 // entries in the hash table.
-uint32_t OAHashTable::kDefaultInitialSize = 8 * 1024;
+uint32_t OAHashTable::kDefaultInitialSize = 128;
 
 // The default capacity of key-value (overflow) lists when we create them
 uint32_t OAHashTable::kInitialKVListCapacity = 8;
