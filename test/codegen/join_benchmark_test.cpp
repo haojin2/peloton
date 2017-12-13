@@ -149,13 +149,13 @@ class BenchmarkJoinTest : public PelotonCodeGenTest {
     auto *left_b1 =
         new expression::TupleValueExpression(type::TypeId::INTEGER, 0, 1);
     auto *const_1_exp = new expression::ConstantValueExpression(
-        type::ValueFactory::GetIntegerValue(1000*10));
+        type::ValueFactory::GetIntegerValue(2000*10));
     auto *left_a_greater_1 = new expression::ComparisonExpression(
         ExpressionType::COMPARE_GREATERTHANOREQUALTO, left_b1, const_1_exp);
     auto *left_b2 =
         new expression::TupleValueExpression(type::TypeId::INTEGER, 0, 1);
     auto *const_10000_exp = new expression::ConstantValueExpression(
-        type::ValueFactory::GetIntegerValue(2000*10));
+        type::ValueFactory::GetIntegerValue(1000*10));
     auto *left_b_less_10000 = new expression::ComparisonExpression(
         ExpressionType::COMPARE_LESSTHANOREQUALTO, left_b2, const_10000_exp);
     // // left_table.c = right_table.a * 1000
@@ -337,7 +337,7 @@ class BenchmarkJoinTest : public PelotonCodeGenTest {
   }
 
  private:
-  uint32_t num_rows_to_insert = 1000000;
+  uint32_t num_rows_to_insert = 10000000;
 };
 
 void PrintName(std::string test_name) {
