@@ -829,6 +829,11 @@ parser::ColumnDefinition* PostgresParser::ColumnDefTransform(ColumnDef* root) {
         StringUtil::Format("Column DataType %s not supported yet...\n", name));
   }
 
+  if (type_name->arrayBounds) {
+    // TODO: Mark corresponding fields in ColumnDefinition class to denote
+    // an array column
+  }
+
   // Transform Varchar len
   result = new ColumnDefinition(root->colname, data_type);
   if (type_name->typmods) {
@@ -1201,18 +1206,57 @@ PostgresParser::ValueListsTransform(List* root) {
 
     List* target = (List*)(value_list->data.ptr_value);
     for (auto cell = target->head; cell != NULL; cell = cell->next) {
-      auto expr = reinterpret_cast<Expr*>(cell->data.ptr_value);
-      if (expr->type == T_ParamRef)
-        cur_result.push_back(std::unique_ptr<expression::AbstractExpression>(
-            ParamRefTransform((ParamRef*)expr)));
-      else if (expr->type == T_A_Const)
-        cur_result.push_back(std::unique_ptr<expression::AbstractExpression>(
-            ConstTransform((A_Const*)expr)));
-      else if (expr->type == T_SetToDefault) {
-        // TODO handle default type
-        // add corresponding expression for
-        // default to cur_result
-        cur_result.push_back(nullptr);
+      auto expr = reinterpret_cast<Expr *>(cell->data.ptr_value);
+      switch (expr->type) {
+        case T_ParamRef: {
+          cur_result.push_back(std::unique_ptr<expression::AbstractExpression>(
+            ParamRefTransform((ParamRef *)expr)));
+          break;
+        }
+        case T_A_Const: {
+          cur_result.push_back(std::unique_ptr<expression::AbstractExpression>(
+            ConstTransform((A_Const *)expr)));
+          break;
+        }
+        case T_TypeCast: {
+          try {
+            cur_result.push_back(std::unique_ptr<expression::AbstractExpression>(
+                TypeCastTransform((TypeCast *)expr)));
+          } catch (Exception e) {
+            delete result;
+            throw e;
+          }
+          break;
+        }
+        case T_SetToDefault: {
+          // TODO handle default type
+          // add corresponding expression for
+          // default to cur_result
+          cur_result.push_back(nullptr);
+          break;
+        }
+        case T_A_ArrayExpr: {
+          throw NotImplementedException(
+            "ArrayExprTransform under construction...\n");
+          // TODO: Transform to target ArrayExpression
+          // with a possible ArrayExprTransform function
+          for (auto elem = elements->head; elem != nullptr; elem = elem->next) {
+            switch (elem->type) {
+              case T_A_Const: {
+                // call ConstTransform((A_Const *)elem) to get the
+                // corresponding transform
+                break;
+              }
+              default:
+                throw NotImplementedException(StringUtil::Format(
+                  "Array element of type %d not supported yet...", elem->type));
+            }
+          }
+          break;
+        }
+        default:
+          throw NotImplementedException(StringUtil::Format(
+            "Value of type %d not supported yet...\n", expr->type));
       }
     }
     result->push_back(std::move(cur_result));
